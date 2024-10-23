@@ -1,25 +1,22 @@
 import streamlit as st
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
-from peft import PeftModel
 
 # Define the alpaca prompt template
 alpaca_prompt = "### Instruction:\n{}\n\n### Input:\n{}\n\n### Response:\n{}"
 
-# Load the base model
+# Load the model
 @st.cache_resource
 def load_model():
+    # Load the base model
     base_model = AutoModelForCausalLM.from_pretrained(
-        "unsloth/meta-llama-3.1-8b-bnb-4bit",  # Base model
-        load_in_4bit=False,                     # Disable 4-bit quantization for CPU
-        device_map="auto"                      # This will still load the model onto CPU
+        "unsloth/meta-llama-3.1-8b-bnb-4bit"  # Base model
     )
 
-    # Load the PEFT fine-tuned model
-    model = PeftModel.from_pretrained(base_model, "tarek009/my_little_broker")  # Your fine-tuned PEFT model
-
-    # Optional: Convert the model to half-precision for faster inference (fp16), but ensure it's supported on CPU
-    model.float()  # Use float precision instead of half
+    # Apply dynamic quantization
+    model = torch.quantization.quantize_dynamic(
+        base_model, {torch.nn.Linear}, dtype=torch.qint8
+    )
 
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained("unsloth/meta-llama-3.1-8b-bnb-4bit")
@@ -30,7 +27,7 @@ def load_model():
 st.title("My Little Broker LLM")
 
 # User input for the prompt
-user_prompt = st.text_area("Enter your prompt:", value="Where can I find the online listing for the building in Greater Cairo  /  Bait El Watan El Asasy?")
+user_prompt = st.text_area("Enter your prompt:", value="Where can I find the online listing for the building in Greater Cairo / Bait El Watan El Asasy?")
 
 # Load the model and tokenizer
 model, tokenizer = load_model()
@@ -39,8 +36,8 @@ if st.button("Generate Response"):
     # Define your prompt using the alpaca format
     prompt = alpaca_prompt.format(user_prompt, "", "")
 
-    # Tokenize the input prompt and keep it on CPU
-    inputs = tokenizer([prompt], return_tensors="pt")  # No need to move to GPU
+    # Tokenize the input prompt
+    inputs = tokenizer([prompt], return_tensors="pt")
 
     # Generate the output (text generation)
     with st.spinner("Generating response..."):
