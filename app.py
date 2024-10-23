@@ -3,6 +3,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from peft import PeftModel
 
+
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["BNB_CUDA_VERSION"] = "118"
 # Define the alpaca prompt template
 alpaca_prompt = "### Instruction:\n{}\n\n### Input:\n{}\n\n### Response:\n{}"
 
