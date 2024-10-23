@@ -3,8 +3,8 @@ transformers
 accelerate
 scipy
 --extra-index-url https://download.pytorch.org/whl/cu118
-torch
-torchvision
-torchaudio
-bitsandbytes==0.44.1  # Using a stable version known to work with Python 3.10
+torch==2.1.2+cu118
+torchvision==0.16.2+cu118
+torchaudio==2.1.2+cu118
+bitsandbytes==0.41.1
 peft
