@@ -1,6 +1,10 @@
 streamlit
 transformers
-peft
+accelerate
+scipy
+--extra-index-url https://download.pytorch.org/whl/cu118
 torch
-bitsandbytes==0.44.1
-bitsandbytes-cuda117==0.44.1
+torchvision
+torchaudio
+bitsandbytes==0.41.1  # Using a stable version known to work with Python 3.10
+peft
