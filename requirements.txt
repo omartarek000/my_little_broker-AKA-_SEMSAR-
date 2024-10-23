@@ -2,9 +2,8 @@ streamlit
 transformers
 accelerate
 scipy
---extra-index-url https://download.pytorch.org/whl/cu118
+bitsandbytes==0.40.0
 torch==2.1.2+cu118
 torchvision==0.16.2+cu118
 torchaudio==2.1.2+cu118
-git+https://github.com/unslothai/unsloth.git#egg=unsloth[cu121-torch240]
 peft
