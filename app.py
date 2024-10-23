@@ -2,6 +2,7 @@ import streamlit as st
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from peft import PeftModel
+import os
 
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
