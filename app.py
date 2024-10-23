@@ -2,31 +2,24 @@ import streamlit as st
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from peft import PeftModel
-import os
 
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-os.environ["BNB_CUDA_VERSION"] = "118"
 # Define the alpaca prompt template
 alpaca_prompt = "### Instruction:\n{}\n\n### Input:\n{}\n\n### Response:\n{}"
 
-# Load the base model with 4-bit quantization using bitsandbytes
+# Load the base model
 @st.cache_resource
 def load_model():
     base_model = AutoModelForCausalLM.from_pretrained(
         "unsloth/meta-llama-3.1-8b-bnb-4bit",  # Base model
-        load_in_4bit=True,                     # Enable 4-bit quantization
-        device_map="auto"                      # Automatically maps the model to the appropriate device (GPU if available)
+        load_in_4bit=False,                     # Disable 4-bit quantization for CPU
+        device_map="auto"                      # This will still load the model onto CPU
     )
 
     # Load the PEFT fine-tuned model
     model = PeftModel.from_pretrained(base_model, "tarek009/my_little_broker")  # Your fine-tuned PEFT model
 
-    # Optional: Convert the model to half-precision for faster inference (fp16)
-    model.half()
-
-    # Optional: Use PyTorch 2.0+ dynamic optimization
-    model = torch.compile(model)
+    # Optional: Convert the model to half-precision for faster inference (fp16), but ensure it's supported on CPU
+    model.float()  # Use float precision instead of half
 
     # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained("unsloth/meta-llama-3.1-8b-bnb-4bit")
@@ -46,8 +39,8 @@ if st.button("Generate Response"):
     # Define your prompt using the alpaca format
     prompt = alpaca_prompt.format(user_prompt, "", "")
 
-    # Tokenize the input prompt and move it to GPU if available
-    inputs = tokenizer([prompt], return_tensors="pt").to("cuda")
+    # Tokenize the input prompt and keep it on CPU
+    inputs = tokenizer([prompt], return_tensors="pt")  # No need to move to GPU
 
     # Generate the output (text generation)
     with st.spinner("Generating response..."):
