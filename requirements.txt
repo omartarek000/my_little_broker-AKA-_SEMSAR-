@@ -6,5 +6,5 @@ scipy
 torch
 torchvision
 torchaudio
-bitsandbytes==0.41.1  # Using a stable version known to work with Python 3.10
+bitsandbytes==0.44.1  # Using a stable version known to work with Python 3.10
 peft
